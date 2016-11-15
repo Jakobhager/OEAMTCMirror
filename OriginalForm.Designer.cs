@@ -38,6 +38,7 @@
             // timer1
             // 
             this.timer1.Enabled = true;
+            this.timer1.Interval = 5;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // notifyIcon1
@@ -64,6 +65,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(150, 43);
             this.Controls.Add(this.label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OriginalForm";
             this.Text = "OEAMTCMirror";
             this.Resize += new System.EventHandler(this.OriginalForm_Resize);

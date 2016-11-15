@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-//using static OEAMTCMirror.User32;
 
 namespace OEAMTCMirror
 {
@@ -45,21 +44,21 @@ namespace OEAMTCMirror
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
-            //if (m.Msg == HotKey.WM_HOTKEY_MSG_ID)
-            //{
-            //    if ((int)m.WParam == 0)
-            //    {
-            //        if (!_mirrorState.Active)
-            //        {
-            //            StartMirroring();
+            if (m.Msg == HotKey.WM_HOTKEY_MSG_ID)
+            {
+                if ((int)m.WParam == 0)
+                {
+                    if (!_mirrorState.Active)
+                    {
+                        StartMirroring();
 
-            //        }
-            //        else
-            //        {
-            //            StopMirroring();
-            //        }
-            //    }
-            //}
+                    }
+                    else
+                    {
+                        StopMirroring();
+                    }
+                }
+            }
 
             base.WndProc(ref m);
         }
@@ -159,7 +158,7 @@ namespace OEAMTCMirror
                     timer1.Stop();
                     _mirroredForm.Hide();
                     _mirrorState.Active = false;
-                    _mirrorIndicator.Hide();
+                    //_mirrorIndicator.Hide();
                     _itemStop.Enabled = false;
                 }
             }
@@ -494,7 +493,9 @@ namespace OEAMTCMirror
                 _mirrorState.Active = true;
                 _itemStop.Enabled = true;
 
-                _mirrorIndicator.Show();
+                notifyIcon1.Icon = Properties.Resources.icon_active;
+
+                //_mirrorIndicator.Show();
             }
             catch (Exception ex)
             {
@@ -514,7 +515,10 @@ namespace OEAMTCMirror
 
                 _mirrorState.SelectedProcess = null;
 
-                _mirrorIndicator.Hide();
+
+                notifyIcon1.Icon = Properties.Resources.notifiyicon;
+
+                //_mirrorIndicator.Hide();
                 GC.Collect();
             }
             catch (Exception ex)

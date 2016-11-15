@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PinBtn));
             this.btnStartMirror = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -39,10 +38,10 @@
             // 
             // btnStartMirror
             // 
-            this.btnStartMirror.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnStartMirror.BackgroundImage")));
+            this.btnStartMirror.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.btnStartMirror.Location = new System.Drawing.Point(0, 0);
             this.btnStartMirror.Name = "btnStartMirror";
-            this.btnStartMirror.Size = new System.Drawing.Size(33, 34);
+            this.btnStartMirror.Size = new System.Drawing.Size(24, 24);
             this.btnStartMirror.TabIndex = 0;
             this.btnStartMirror.UseVisualStyleBackColor = true;
             this.btnStartMirror.Click += new System.EventHandler(this.btnStartMirror_Click);
@@ -59,14 +58,14 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.stopMirrorToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(135, 26);
             this.contextMenuStrip1.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip1_Closing);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // stopMirrorToolStripMenuItem
             // 
             this.stopMirrorToolStripMenuItem.Name = "stopMirrorToolStripMenuItem";
-            this.stopMirrorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stopMirrorToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.stopMirrorToolStripMenuItem.Text = "Stop Mirror";
             this.stopMirrorToolStripMenuItem.Click += new System.EventHandler(this.stopMirrorToolStripMenuItem_Click);
             // 
@@ -75,7 +74,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Maroon;
-            this.ClientSize = new System.Drawing.Size(39, 37);
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.ClientSize = new System.Drawing.Size(30, 29);
             this.Controls.Add(this.btnStartMirror);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "PinBtn";

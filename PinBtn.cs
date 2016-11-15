@@ -32,6 +32,8 @@ namespace OEAMTCMirror
 
             timer1.Start();
 
+            btnStartMirror.BackgroundImage = Properties.Resources.btn_bg;
+
             btnStartMirror.Hide();
         }
 
@@ -53,7 +55,7 @@ namespace OEAMTCMirror
                     User32.Rect rectangleWindow = new User32.Rect();
                     User32.GetWindowRect(ptr, ref rectangleWindow);
 
-                    this.Top = rectangleWindow.top + 2;
+                    this.Top = rectangleWindow.top + 5;
                     this.Left = rectangleWindow.right - 160;
                 }
             }
@@ -117,11 +119,13 @@ namespace OEAMTCMirror
             CheckSysTrayOpen();
             if (_mirrorState.Active)
             {
+                btnStartMirror.BackgroundImage = Properties.Resources.btn_bg_active;
                 //btnStartMirror.Text = "Stop";
                 stopMirrorToolStripMenuItem.Enabled = true;
             }
             else
             {
+                btnStartMirror.BackgroundImage = Properties.Resources.btn_bg;
                 //btnStartMirror.Text = "Start";
                 stopMirrorToolStripMenuItem.Enabled = false;
             }
@@ -156,8 +160,8 @@ namespace OEAMTCMirror
 
         private void btnStartMirror_MouseUp(object sender, MouseEventArgs e)
         {
-                timer1.Start();
-                _mainForm.timer1.Interval = 5;
+            timer1.Start();
+            _mainForm.timer1.Interval = 5;
         }
         private void stopMirrorToolStripMenuItem_Click(object sender, EventArgs e)
         {
