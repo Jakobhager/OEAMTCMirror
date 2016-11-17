@@ -10,8 +10,11 @@ namespace OEAMTCMirror
     public class MirrorState
     {
         public enum Modes {Null, Hotkey, Button};
+        public enum MirrorTypes { Screenshot, Window };
+
         private bool _mirrorState;
         private Process _process;
+        private MirrorTypes _type;
 
         public bool Active
         {
@@ -34,6 +37,18 @@ namespace OEAMTCMirror
             set
             {
                 this._process = value;
+            }
+        }
+
+        public MirrorTypes MirrorType
+        {
+            get
+            {
+                return this._type;
+            }
+            set
+            {
+                this._type = value;
             }
         }
     }

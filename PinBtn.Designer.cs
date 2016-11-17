@@ -58,15 +58,15 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.stopMirrorToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(135, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(183, 48);
             this.contextMenuStrip1.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip1_Closing);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // stopMirrorToolStripMenuItem
             // 
             this.stopMirrorToolStripMenuItem.Name = "stopMirrorToolStripMenuItem";
-            this.stopMirrorToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-            this.stopMirrorToolStripMenuItem.Text = "Stop Mirror";
+            this.stopMirrorToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.stopMirrorToolStripMenuItem.Text = "Spiegelung beenden";
             this.stopMirrorToolStripMenuItem.Click += new System.EventHandler(this.stopMirrorToolStripMenuItem_Click);
             // 
             // PinBtn

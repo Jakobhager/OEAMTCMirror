@@ -28,6 +28,8 @@ namespace OEAMTCMirror
         MenuItem _itemStop = new MenuItem();
         public PinBtn _pinBtnForm;
 
+        private string[] _screenshotWindows = { "chrome", "whatsapp", "iexplore", "swtor", "client", "devenv", "opera" };
+
         List<Process> _openWindows = new List<Process>();
 
         MirrorState _mirrorState;
@@ -77,16 +79,16 @@ namespace OEAMTCMirror
             _notifyContextMenu.MenuItems.Add(_itemStop);
 
             itemClose.Index = 2;
-            itemClose.Text = "Quit";
+            itemClose.Text = "Schließen";
             itemClose.Click += new EventHandler(this.itemClose_Click);
 
             _itemStop.Index = 0;
-            _itemStop.Text = "Stop Mirroring";
+            _itemStop.Text = "Spiegelung beenden";
             _itemStop.Enabled = false;
             _itemStop.Click += new EventHandler(this.itemStop_Click);
 
             itemCheckSecond.Index = 1;
-            itemCheckSecond.Text = "Show second screen";
+            itemCheckSecond.Text = "Zweiten Bildschirm anzeigen";
             itemCheckSecond.Click += new EventHandler(this.itemCheckSecond_Click);
 
             notifyIcon1.ContextMenu = _notifyContextMenu;
@@ -115,7 +117,7 @@ namespace OEAMTCMirror
             }
             else
             {
-                MessageBox.Show("Single monitor not supported\r\nMirror won't work as supposed");
+                MessageBox.Show("Single monitor nicht unterstützt.\r\nSpiegelung funtkioniert nicht wie gewünscht.");
 
                 Environment.Exit(0);
             }
@@ -138,28 +140,41 @@ namespace OEAMTCMirror
         {
             try
             {
-                GetDesktopWindowsTitlesToPrivateVar();
-
-                User32.Rect rc = new User32.Rect();
-                User32.GetWindowRect(_mirrorState.SelectedProcess.MainWindowHandle, ref rc);
-
-                if (!_mirrorState.SelectedProcess.HasExited || _openWindows.Contains(_mirrorState.SelectedProcess))
+                if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
                 {
-                    if (User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle))
+                    GetDesktopWindowsTitlesToPrivateVar();
+
+                    User32.Rect rc = new User32.Rect();
+                    User32.GetWindowRect(_mirrorState.SelectedProcess.MainWindowHandle, ref rc);
+
+                    if (!_mirrorState.SelectedProcess.HasExited || _openWindows.Contains(_mirrorState.SelectedProcess))
                     {
-                        User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.Restore);
-                    }
+                        //if (User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle))
+                        //{
+                        //    User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.Restore);
+                        //}
 
-                    DrawImageToForm();
-                }
-                else
-                {
-                    _mirrorState.SelectedProcess = null;
-                    timer1.Stop();
-                    _mirroredForm.Hide();
-                    _mirrorState.Active = false;
-                    //_mirrorIndicator.Hide();
-                    _itemStop.Enabled = false;
+                        var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
+
+                        if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
+                            !User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                            placement.showCmd == User32.ShowWindowCommands.Normal)
+                        {
+                            //User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                            BringWindowToForeground(_mirrorState.SelectedProcess);
+                            //User32.ShowWindowAsync(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                        }
+                        DrawImageToForm();
+                    }
+                    else
+                    {
+                        _mirrorState.SelectedProcess = null;
+                        timer1.Stop();
+                        _mirroredForm.Hide();
+                        _mirrorState.Active = false;
+                        //_mirrorIndicator.Hide();
+                        _itemStop.Enabled = false;
+                    }
                 }
             }
             catch { }
@@ -172,12 +187,42 @@ namespace OEAMTCMirror
 
             try
             {
-                //var bmpScreenshot = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, PixelFormat.Format32bppArgb);
-                var bmpScreenshot = new Bitmap(Screen.PrimaryScreen.WorkingArea.Width, Screen.PrimaryScreen.WorkingArea.Height - 25, PixelFormat.Format32bppArgb);
-                var gfxScreenshot = Graphics.FromImage(bmpScreenshot);
-                //gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X, Screen.PrimaryScreen.Bounds.Y, 0, 0, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
-                gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.WorkingArea.X, Screen.PrimaryScreen.WorkingArea.Y + 25, 0, 0, Screen.PrimaryScreen.WorkingArea.Size, CopyPixelOperation.SourceCopy);
+                Bitmap bmpScreenshot = null;
+                if (_screenshotWindows.Contains(_mirrorState.SelectedProcess.ProcessName.ToLower()))
+                //if (_mirrorState.SelectedProcess.ProcessName == "chrome" || _mirrorState.SelectedProcess.ProcessName.ToLower() == "whatsapp")
+                {
+                    //BringWindowToForeground(_mirrorState.SelectedProcess);
 
+                    var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
+
+                    if (placement.showCmd == User32.ShowWindowCommands.Normal)
+                    {
+                        User32.ShowWindowAsync(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                    }
+
+                    //bmpScreenshot = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, PixelFormat.Format32bppArgb);
+                    bmpScreenshot = new Bitmap(Screen.PrimaryScreen.WorkingArea.Width, Screen.PrimaryScreen.WorkingArea.Height - 25, PixelFormat.Format32bppArgb);
+                    var gfxScreenshot = Graphics.FromImage(bmpScreenshot);
+                    //gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X, Screen.PrimaryScreen.Bounds.Y, 0, 0, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
+                    gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.WorkingArea.X, Screen.PrimaryScreen.WorkingArea.Y + 25, 0, 0, Screen.PrimaryScreen.WorkingArea.Size, CopyPixelOperation.SourceCopy);
+
+                }
+                else
+                {
+                    User32.Rect rct = new User32.Rect();
+                    User32.GetWindowRect(_mirrorState.SelectedProcess.MainWindowHandle, ref rct);
+
+                    //Graphics gr = Graphics.FromHwnd(_mirrorState.SelectedProcess.MainWindowHandle);
+
+                    bmpScreenshot = new Bitmap(rct.right - rct.left, rct.bottom - rct.top);
+
+                    Graphics memoryGraphics = Graphics.FromImage(bmpScreenshot);
+
+                    IntPtr dc = memoryGraphics.GetHdc();
+                    bool success = User32.PrintWindow(_mirrorState.SelectedProcess.MainWindowHandle, dc, 1);
+                    //bool success = User32.PrintWindow(_mirrorState.SelectedProcess.MainWindowHandle, dc, 0);
+                    memoryGraphics.ReleaseHdc(dc);
+                }
 
                 //Mouse addition by http://www.codeproject.com/KB/cs/DesktopCaptureWithMouse.aspx?display=Print
                 int cursorX = 0;
@@ -203,15 +248,17 @@ namespace OEAMTCMirror
 
                         if (placement.showCmd == User32.ShowWindowCommands.Normal)
                         {
-                            //get window rect from process
-                            User32.Rect rc = new User32.Rect();
-                            User32.GetWindowRect(_mirrorState.SelectedProcess.MainWindowHandle, ref rc);
+                            ////get window rect from process
+                            //User32.Rect rc = new User32.Rect();
+                            //User32.GetWindowRect(_mirrorState.SelectedProcess.MainWindowHandle, ref rc);
 
-                            Bitmap original = new Bitmap(desktopBMP);
-                            Rectangle srcRect = new Rectangle(rc.left, rc.top, rc.right - rc.left - 50, rc.bottom - rc.top - 50);
+                            //Bitmap original = new Bitmap(desktopBMP);
+                            ////Rectangle srcRect = new Rectangle(rc.left, rc.top, rc.right - rc.left - 50, rc.bottom - rc.top - 50);
+                            //Rectangle srcRect = new Rectangle(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
 
-                            //Bitmap cropped = (Bitmap)original.Clone(srcRect, original.PixelFormat);
-                            cropped = (Bitmap)original.Clone(srcRect, original.PixelFormat);
+                            ////Bitmap cropped = (Bitmap)original.Clone(srcRect, original.PixelFormat);
+                            //cropped = (Bitmap)original.Clone(srcRect, original.PixelFormat);+
+                            cropped = desktopBMP;
                         }
                         else
                         {
@@ -219,7 +266,7 @@ namespace OEAMTCMirror
                         }
 
                         GC.Collect();
-                        
+
                         //return bmpScreenshot;
                         return cropped;
 
@@ -323,10 +370,14 @@ namespace OEAMTCMirror
         {
             try
             {
-                BringWindowToForeground(_mirrorState.SelectedProcess);
+                //BringWindowToForeground(_mirrorState.SelectedProcess);
                 Bitmap bmp = CaptureApplication(_mirrorState.SelectedProcess);
 
                 this.DrawToBitmap(bmp, new Rectangle(Point.Empty, bmp.Size));
+
+                _mirroredForm.Height = bmp.Height;
+                _mirroredForm.Width = bmp.Width;
+
                 _mirroredForm.MirrorPictureBox.Image = bmp;
                 GC.Collect();
             }
@@ -477,12 +528,23 @@ namespace OEAMTCMirror
             try
             {
                 _mirrorState.SelectedProcess = GetProcessFromActiveWindow();
-                DrawImageToForm();
+
+                if (_screenshotWindows.Contains(_mirrorState.SelectedProcess.ProcessName))
+                {
+                    _mirrorState.MirrorType = MirrorState.MirrorTypes.Screenshot;
+                    User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                }
+                else
+                {
+                    _mirrorState.MirrorType = MirrorState.MirrorTypes.Window;
+                }
 
                 this.WindowState = FormWindowState.Minimized;
 
                 //Allow 250 milliseconds for the screen to repaint itself (we don't want to include this form in the capture)
-                Thread.Sleep(250);
+                Thread.Sleep(350);
+
+                DrawImageToForm();
 
                 timer1.Start();
                 _mirroredForm.Show();

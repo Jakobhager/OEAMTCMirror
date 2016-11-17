@@ -79,13 +79,21 @@ namespace OEAMTCMirror
                     IntPtr foregroundWnd = User32.GetForegroundWindow();
                     User32.GetWindowThreadProcessId(foregroundWnd, out processID);
                     Process prc = Process.GetProcessById((int)processID);
-                    User32.SetForegroundWindow(prc.MainWindowHandle);
+                    if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot)
+                    {
+                        User32.SetForegroundWindow(prc.MainWindowHandle);
+                    }
                     _mirrorState.SelectedProcess = prc;
 
                     //btnStartMirror.Text = "Stop";
                     PositionButton();
                     _mainForm.StartMirroring();
                     this.Show();
+
+                    //if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Window)
+                    //{
+                    //    User32.SetForegroundWindow(prc.MainWindowHandle);
+                    //}
                 }
                 else
                 {
