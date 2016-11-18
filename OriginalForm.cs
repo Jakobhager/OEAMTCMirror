@@ -29,6 +29,7 @@ namespace OEAMTCMirror
         public PinBtn _pinBtnForm;
 
         private string[] _screenshotWindows = { "chrome", "whatsapp", "iexplore", "swtor", "client", "devenv", "opera" };
+        public string[] _excludedWindows = { "OEAMTCMirror", "explorer", "kvirc" };
 
         List<Process> _openWindows = new List<Process>();
 
@@ -104,16 +105,19 @@ namespace OEAMTCMirror
 
             Screen[] screens = Screen.AllScreens;
 
+
             if (screens.Length > 1)
             {
                 _mirroredForm = new MirroredForm(this);
 
                 _mirroredForm.FormBorderStyle = FormBorderStyle.None;
-                _mirroredForm.WindowState = FormWindowState.Maximized;
+                //_mirroredForm.WindowState = FormWindowState.Maximized;
 
                 _mirroredForm.StartPosition = FormStartPosition.Manual;
 
-                _mirroredForm.Left = screens[0].Bounds.Left + screens[1].Bounds.Left;
+                //_mirroredForm.Left = screens[0].Bounds.Left + screens[1].Bounds.Left;
+                //_mirroredForm.Left = screens[screens.Length - 1].Bounds.Left;
+                _mirroredForm.Location = screens[screens.Length - 1].WorkingArea.Location;
             }
             else
             {
@@ -351,10 +355,11 @@ namespace OEAMTCMirror
         {
             try
             {
+                int index = Screen.AllScreens.Length - 1;
                 //var bmpScreenshot = new Bitmap(Screen.PrimaryScreen.WorkingArea.Width, Screen.PrimaryScreen.WorkingArea.Height - 25, PixelFormat.Format32bppArgb);
-                var bmpScreenshot = new Bitmap(Screen.AllScreens[1].Bounds.Width, Screen.AllScreens[1].Bounds.Height, PixelFormat.Format32bppArgb);
+                var bmpScreenshot = new Bitmap(Screen.AllScreens[index].Bounds.Width, Screen.AllScreens[index].Bounds.Height, PixelFormat.Format32bppArgb);
                 var gfxScreenshot = Graphics.FromImage(bmpScreenshot);
-                gfxScreenshot.CopyFromScreen(Screen.AllScreens[1].Bounds.X, Screen.AllScreens[1].Bounds.Y, 0, 0, Screen.AllScreens[1].Bounds.Size, CopyPixelOperation.SourceCopy);
+                gfxScreenshot.CopyFromScreen(Screen.AllScreens[index].Bounds.X, Screen.AllScreens[index].Bounds.Y, 0, 0, Screen.AllScreens[index].Bounds.Size, CopyPixelOperation.SourceCopy);
 
                 return bmpScreenshot;
             }

@@ -46,8 +46,9 @@ namespace OEAMTCMirror
                 User32.GetWindowThreadProcessId(foregroundWnd, out processID);
                 Process prc = Process.GetProcessById((int)processID);
 
-                //if (prc.MainWindowTitle != "PinBtn" || prc.MainWindowTitle != "MirroredScreen" || prc.MainWindowTitle != "OEAMTCMirror" ||prc.MainWindowTitle != "SecondScreenMirror")
-                if (prc.Id != Process.GetCurrentProcess().Id || prc.MainWindowTitle != "Shell_Traywnd")
+                //if (prc.Id != Process.GetCurrentProcess().Id || prc.MainWindowTitle != "Shell_Traywnd")
+                //if (prc.Id != Process.GetCurrentProcess().Id && prc.MainWindowTitle != "Shell_Traywnd" && !_mainForm._excludedWindows.Contains(prc.ProcessName))
+                if (prc.ProcessName != Process.GetCurrentProcess().ProcessName && prc.MainWindowTitle != "Shell_Traywnd" && !_mainForm._excludedWindows.Contains(prc.ProcessName))
                 {
                     btnStartMirror.Show();
                     IntPtr ptr = prc.MainWindowHandle;
