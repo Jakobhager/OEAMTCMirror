@@ -118,6 +118,9 @@ namespace OEAMTCMirror
                 //_mirroredForm.Left = screens[0].Bounds.Left + screens[1].Bounds.Left;
                 //_mirroredForm.Left = screens[screens.Length - 1].Bounds.Left;
                 _mirroredForm.Location = screens[screens.Length - 1].WorkingArea.Location;
+
+                _mirroredForm.Size = screens[screens.Length - 1].Bounds.Size;
+
             }
             else
             {
@@ -380,8 +383,8 @@ namespace OEAMTCMirror
 
                 this.DrawToBitmap(bmp, new Rectangle(Point.Empty, bmp.Size));
 
-                _mirroredForm.Height = bmp.Height;
-                _mirroredForm.Width = bmp.Width;
+                _mirroredForm.MirrorPictureBox.Height = bmp.Height;
+                _mirroredForm.MirrorPictureBox.Width = bmp.Width;
 
                 _mirroredForm.MirrorPictureBox.Image = bmp;
                 GC.Collect();

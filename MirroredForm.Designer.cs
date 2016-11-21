@@ -34,11 +34,10 @@
             // 
             // MirrorPictureBox
             // 
-            this.MirrorPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MirrorPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.MirrorPictureBox.Location = new System.Drawing.Point(0, 0);
             this.MirrorPictureBox.Name = "MirrorPictureBox";
-            this.MirrorPictureBox.Size = new System.Drawing.Size(284, 261);
-            this.MirrorPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.MirrorPictureBox.Size = new System.Drawing.Size(155, 131);
             this.MirrorPictureBox.TabIndex = 0;
             this.MirrorPictureBox.TabStop = false;
             // 
