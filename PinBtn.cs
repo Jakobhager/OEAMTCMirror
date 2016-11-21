@@ -80,16 +80,18 @@ namespace OEAMTCMirror
                     IntPtr foregroundWnd = User32.GetForegroundWindow();
                     User32.GetWindowThreadProcessId(foregroundWnd, out processID);
                     Process prc = Process.GetProcessById((int)processID);
-                    if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot)
-                    {
-                        User32.SetForegroundWindow(prc.MainWindowHandle);
-                    }
+                    //if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot)
+                    //{
+                    //    User32.SetForegroundWindow(prc.MainWindowHandle);
+                    //}
                     _mirrorState.SelectedProcess = prc;
 
                     //btnStartMirror.Text = "Stop";
                     PositionButton();
                     _mainForm.StartMirroring();
                     this.Show();
+
+                    User32.SetForegroundWindow(prc.MainWindowHandle);
 
                     //if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Window)
                     //{
@@ -110,15 +112,20 @@ namespace OEAMTCMirror
 
         private void CheckSysTrayOpen()
         {
-            uint processID;
-            IntPtr foregroundWnd = User32.GetForegroundWindow();
-            User32.GetWindowThreadProcessId(foregroundWnd, out processID);
-            Process prc = Process.GetProcessById((int)processID);
-
-            if (prc.MainWindowTitle == "Shell_Traywnd")
+            try
             {
-                this.Hide();
+                uint processID;
+                IntPtr foregroundWnd = User32.GetForegroundWindow();
+                User32.GetWindowThreadProcessId(foregroundWnd, out processID);
+                Process prc = Process.GetProcessById((int)processID);
+
+                if (prc.MainWindowTitle == "Shell_Traywnd")
+                {
+                    this.Hide();
+                }
             }
+            catch (Exception ex)
+            { }
         }
 
         #region Buttons, Hover, etc

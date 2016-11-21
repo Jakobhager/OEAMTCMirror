@@ -29,7 +29,7 @@ namespace OEAMTCMirror
         public PinBtn _pinBtnForm;
 
         private string[] _screenshotWindows = { "chrome", "whatsapp", "iexplore", "swtor", "client", "devenv", "opera" };
-        public string[] _excludedWindows = { "OEAMTCMirror", "explorer", "kvirc" };
+        public string[] _excludedWindows = { "explorer", Process.GetCurrentProcess().ProcessName };
 
         List<Process> _openWindows = new List<Process>();
 
@@ -110,8 +110,8 @@ namespace OEAMTCMirror
             {
                 _mirroredForm = new MirroredForm(this);
 
-                _mirroredForm.FormBorderStyle = FormBorderStyle.None;
-                //_mirroredForm.WindowState = FormWindowState.Maximized;
+                //_mirroredForm.FormBorderStyle = FormBorderStyle.None;
+                _mirroredForm.WindowState = FormWindowState.Normal;
 
                 _mirroredForm.StartPosition = FormStartPosition.Manual;
 
@@ -554,8 +554,8 @@ namespace OEAMTCMirror
                 timer1.Start();
                 _mirroredForm.Show();
 
-                _mirroredForm.WindowState = FormWindowState.Maximized;
-                _mirroredForm.Activate();
+                //_mirroredForm.WindowState = FormWindowState.Maximized;
+                //_mirroredForm.Activate();
 
                 _mirrorState.Active = true;
                 _itemStop.Enabled = true;

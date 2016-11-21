@@ -23,6 +23,7 @@ namespace OEAMTCMirror
             InitializeComponent();
             _mainForm = mainfrm as OriginalForm;
             this.ShowInTaskbar = false;
+            this.WindowState = FormWindowState.Normal;
         }
 
         private void btnCloseMirror_Click(object sender, EventArgs e)
