@@ -33,6 +33,7 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.label1 = new System.Windows.Forms.Label();
+            this.windowClosedTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // timer1
@@ -59,6 +60,10 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "ÖAMTC Mirroring Tool";
             // 
+            // windowClosedTimer
+            // 
+            this.windowClosedTimer.Interval = 1000;
+            // 
             // OriginalForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -79,6 +84,7 @@
         public System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Timer windowClosedTimer;
     }
 }
 

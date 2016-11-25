@@ -28,7 +28,7 @@ namespace OEAMTCMirror
         MenuItem _itemStop = new MenuItem();
         public PinBtn _pinBtnForm;
 
-        private string[] _screenshotWindows = { "chrome", "whatsapp", "iexplore", "swtor", "client", "devenv", "opera" };
+        private string[] _screenshotWindows = { "chrome", "whatsapp", "iexplore", "swtor", "client", "devenv", "opera", "vivaldi" };
         public string[] _excludedWindows = { "explorer", Process.GetCurrentProcess().ProcessName };
 
         List<Process> _openWindows = new List<Process>();
@@ -102,6 +102,7 @@ namespace OEAMTCMirror
             HK.enable(this.Handle, 0, Keys.F8);
 
             timer1.Stop();
+            windowClosedTimer.Start();
 
             Screen[] screens = Screen.AllScreens;
 
@@ -147,41 +148,44 @@ namespace OEAMTCMirror
         {
             try
             {
+                //Premature check if our process is closed -> stop the mirror!
+                if (_mirrorState.SelectedProcess.HasExited)
+                {
+                    StopMirroring();
+                }
+
                 if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
                 {
+                    _openWindows.Clear();
                     GetDesktopWindowsTitlesToPrivateVar();
 
                     User32.Rect rc = new User32.Rect();
                     User32.GetWindowRect(_mirrorState.SelectedProcess.MainWindowHandle, ref rc);
 
+
                     if (!_mirrorState.SelectedProcess.HasExited || _openWindows.Contains(_mirrorState.SelectedProcess))
-                    {
+                    { 
+                        
                         //if (User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle))
                         //{
                         //    User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.Restore);
                         //}
 
+
                         var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
 
-                        if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
-                            !User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
-                            placement.showCmd == User32.ShowWindowCommands.Normal)
-                        {
-                            //User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
-                            BringWindowToForeground(_mirrorState.SelectedProcess);
-                            //User32.ShowWindowAsync(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                            if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
+                                !User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                                placement.showCmd == User32.ShowWindowCommands.Normal)
+                            {
+                                BringWindowToForeground(_mirrorState.SelectedProcess);
+                            }
+                            DrawImageToForm();
                         }
-                        DrawImageToForm();
-                    }
-                    else
-                    {
-                        _mirrorState.SelectedProcess = null;
-                        timer1.Stop();
-                        _mirroredForm.Hide();
-                        _mirrorState.Active = false;
-                        //_mirrorIndicator.Hide();
-                        _itemStop.Enabled = false;
-                    }
+                        else
+                        {
+                            StopMirroring();
+                        }
                 }
             }
             catch { }
@@ -531,11 +535,20 @@ namespace OEAMTCMirror
             }
         }
 
+        internal void SelectedProcessExited(object sender, System.EventArgs e)
+        {
+            StopMirroring();
+        }
+
         public void StartMirroring()
         {
             try
             {
                 _mirrorState.SelectedProcess = GetProcessFromActiveWindow();
+
+                //_mirrorState.SelectedProcess.EnableRaisingEvents = true;
+                //_mirrorState.SelectedProcess.Exited += new EventHandler(SelectedProcessExited);
+
 
                 if (_screenshotWindows.Contains(_mirrorState.SelectedProcess.ProcessName))
                 {
@@ -654,6 +667,4 @@ namespace OEAMTCMirror
             }
         }
     }
-
-
 }
