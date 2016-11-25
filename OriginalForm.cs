@@ -74,12 +74,14 @@ namespace OEAMTCMirror
 
             MenuItem itemClose = new MenuItem();
             MenuItem itemCheckSecond = new MenuItem();
+            MenuItem itemMoveWindows = new MenuItem();
 
             _notifyContextMenu.MenuItems.Add(itemClose);
             _notifyContextMenu.MenuItems.Add(itemCheckSecond);
+            _notifyContextMenu.MenuItems.Add(itemMoveWindows);
             _notifyContextMenu.MenuItems.Add(_itemStop);
 
-            itemClose.Index = 2;
+            itemClose.Index = 3;
             itemClose.Text = "Schließen";
             itemClose.Click += new EventHandler(this.itemClose_Click);
 
@@ -92,6 +94,10 @@ namespace OEAMTCMirror
             itemCheckSecond.Text = "Zweiten Bildschirm anzeigen";
             itemCheckSecond.Click += new EventHandler(this.itemCheckSecond_Click);
 
+            itemMoveWindows.Index = 2;
+            itemMoveWindows.Text = "Alle Fenster auf Hauptbildschirm schieben";
+            itemMoveWindows.Click += new EventHandler(this.itemMoveWindows_Click);
+
             notifyIcon1.ContextMenu = _notifyContextMenu;
 
             _pinBtnForm = new PinBtn(_log, this, _mirrorState);
@@ -102,7 +108,6 @@ namespace OEAMTCMirror
             HK.enable(this.Handle, 0, Keys.F8);
 
             timer1.Stop();
-            windowClosedTimer.Start();
 
             Screen[] screens = Screen.AllScreens;
 
@@ -164,8 +169,8 @@ namespace OEAMTCMirror
 
 
                     if (!_mirrorState.SelectedProcess.HasExited || _openWindows.Contains(_mirrorState.SelectedProcess))
-                    { 
-                        
+                    {
+
                         //if (User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle))
                         //{
                         //    User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.Restore);
@@ -174,18 +179,18 @@ namespace OEAMTCMirror
 
                         var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
 
-                            if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
-                                !User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
-                                placement.showCmd == User32.ShowWindowCommands.Normal)
-                            {
-                                BringWindowToForeground(_mirrorState.SelectedProcess);
-                            }
-                            DrawImageToForm();
-                        }
-                        else
+                        if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
+                            !User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                            placement.showCmd == User32.ShowWindowCommands.Normal)
                         {
-                            StopMirroring();
+                            BringWindowToForeground(_mirrorState.SelectedProcess);
                         }
+                        DrawImageToForm();
+                    }
+                    else
+                    {
+                        StopMirroring();
+                    }
                 }
             }
             catch { }
@@ -225,14 +230,18 @@ namespace OEAMTCMirror
 
                     //Graphics gr = Graphics.FromHwnd(_mirrorState.SelectedProcess.MainWindowHandle);
 
-                    bmpScreenshot = new Bitmap(rct.right - rct.left, rct.bottom - rct.top);
+                    try
+                    {
+                        bmpScreenshot = new Bitmap(rct.right - rct.left, rct.bottom - rct.top);
 
-                    Graphics memoryGraphics = Graphics.FromImage(bmpScreenshot);
+                        Graphics memoryGraphics = Graphics.FromImage(bmpScreenshot);
 
-                    IntPtr dc = memoryGraphics.GetHdc();
-                    bool success = User32.PrintWindow(_mirrorState.SelectedProcess.MainWindowHandle, dc, 1);
-                    //bool success = User32.PrintWindow(_mirrorState.SelectedProcess.MainWindowHandle, dc, 0);
-                    memoryGraphics.ReleaseHdc(dc);
+                        IntPtr dc = memoryGraphics.GetHdc();
+                        bool success = User32.PrintWindow(_mirrorState.SelectedProcess.MainWindowHandle, dc, 1);
+                        //bool success = User32.PrintWindow(_mirrorState.SelectedProcess.MainWindowHandle, dc, 0);
+                        memoryGraphics.ReleaseHdc(dc);
+                    }
+                    catch { }
                 }
 
                 //Mouse addition by http://www.codeproject.com/KB/cs/DesktopCaptureWithMouse.aspx?display=Print
@@ -395,7 +404,7 @@ namespace OEAMTCMirror
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
             }
         }
         public void DrawSecondScreenToWindow()
@@ -502,6 +511,17 @@ namespace OEAMTCMirror
             {
                 MessageBox.Show(ex.ToString());
                 return false;
+            }
+        }
+
+        //public void MoveWindows(IntPtr intPtr, int X, int Y)
+        public void MoveWindows()
+        {
+            foreach (Process prc in _openWindows)
+            {
+                //User32.SetWindowPos(intPtr, IntPtr.Zero, X, Y, 0, 0, User32.SetWindowPosFlags.DoNotChangeOwnerZOrder | User32.SetWindowPosFlags.IgnoreResize);
+                User32.SetWindowPos(prc.MainWindowHandle, IntPtr.Zero, 0, 0, 0, 0, User32.SetWindowPosFlags.DoNotChangeOwnerZOrder | User32.SetWindowPosFlags.IgnoreResize);
+                //User32.ShowWindow(prc.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
             }
         }
 
@@ -629,6 +649,13 @@ namespace OEAMTCMirror
             _secondScreenMirror.timer1.Start();
             _secondScreenMirror.Show();
         }
+
+        private void itemMoveWindows_Click(object Sender, EventArgs e)
+        {
+            GetDesktopWindowsTitlesToPrivateVar();
+            MoveWindows();
+        }
+        
 
         private void OriginalForm_Resize(object sender, EventArgs e)
         {
