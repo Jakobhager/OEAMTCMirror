@@ -38,10 +38,16 @@
             // 
             // btnStartMirror
             // 
-            this.btnStartMirror.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnStartMirror.Location = new System.Drawing.Point(0, 0);
+            this.btnStartMirror.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnStartMirror.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnStartMirror.FlatAppearance.BorderColor = System.Drawing.Color.Maroon;
+            this.btnStartMirror.FlatAppearance.BorderSize = 0;
+            this.btnStartMirror.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Maroon;
+            this.btnStartMirror.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnStartMirror.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStartMirror.Location = new System.Drawing.Point(10, 0);
             this.btnStartMirror.Name = "btnStartMirror";
-            this.btnStartMirror.Size = new System.Drawing.Size(24, 24);
+            this.btnStartMirror.Size = new System.Drawing.Size(26, 20);
             this.btnStartMirror.TabIndex = 0;
             this.btnStartMirror.UseVisualStyleBackColor = true;
             this.btnStartMirror.Click += new System.EventHandler(this.btnStartMirror_Click);
@@ -58,7 +64,7 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.stopMirrorToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(183, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(183, 26);
             this.contextMenuStrip1.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip1_Closing);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
@@ -75,9 +81,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Maroon;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.ClientSize = new System.Drawing.Size(30, 29);
+            this.ClientSize = new System.Drawing.Size(36, 20);
             this.Controls.Add(this.btnStartMirror);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.MinimumSize = new System.Drawing.Size(1, 1);
             this.Name = "PinBtn";
             this.Text = "PinBtn";
             this.TopMost = true;

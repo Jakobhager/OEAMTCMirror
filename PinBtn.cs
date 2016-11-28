@@ -30,11 +30,25 @@ namespace OEAMTCMirror
             this._mirrorState = stateObj;
             this.ShowInTaskbar = false;
 
+            PositionButton();
+
             timer1.Start();
 
             btnStartMirror.BackgroundImage = Properties.Resources.btn_bg;
 
-            btnStartMirror.Hide();
+            //btnStartMirror.Hide();
+            this.ClientSize = new Size(26, 26);
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                // turn on WS_EX_TOOLWINDOW style bit
+                cp.ExStyle |= 0x80;
+                return cp;
+            }
         }
 
         private void PositionButton()
@@ -57,7 +71,8 @@ namespace OEAMTCMirror
                     User32.GetWindowRect(ptr, ref rectangleWindow);
 
                     this.Top = rectangleWindow.top + 5;
-                    this.Left = rectangleWindow.right - 160;
+                    this.Left = rectangleWindow.right - 170;
+                    this.Show();
                 }
             }
             catch (Exception ex)

@@ -159,6 +159,52 @@ namespace OEAMTCMirror
                     StopMirroring();
                 }
 
+                //check if window is closed an we can stop the mirror
+                //_openWindows.Clear();
+                //GetDesktopWindowsTitlesToPrivateVar();
+
+                //if (!_mirrorState.SelectedProcess.HasExited || !_openWindows.Contains(_mirrorState.SelectedProcess))
+                //{
+                //    if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
+                //    {
+                //        var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
+
+                //        if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
+                //            //!User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                //            placement.showCmd == User32.ShowWindowCommands.Normal)
+                //        {
+                //            //BringWindowToForeground(_mirrorState.SelectedProcess);
+                //            User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOW);
+                //            User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                //        }
+                //    }
+                //    DrawImageToForm();
+                //}
+                //else
+                //{
+                //    StopMirroring();
+
+                //}
+
+
+                //is the active window the window we want to mirror and the mode is screenshot? maximize it
+                //if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
+                //{
+                //    var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
+
+                //    if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
+                //        //!User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                //        placement.showCmd == User32.ShowWindowCommands.Normal)
+                //    {
+                //        //BringWindowToForeground(_mirrorState.SelectedProcess);
+                //        User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOW);
+                //        User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                //    }
+                //}
+
+                //capture and draw
+
+
                 if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
                 {
                     _openWindows.Clear();
@@ -180,11 +226,22 @@ namespace OEAMTCMirror
                         var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
 
                         if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
-                            !User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                            //!User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
                             placement.showCmd == User32.ShowWindowCommands.Normal)
                         {
-                            BringWindowToForeground(_mirrorState.SelectedProcess);
+                            //BringWindowToForeground(_mirrorState.SelectedProcess);
+                            User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOW);
+                            User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
                         }
+
+
+                        //IntPtr IPTR = User32.GetForegroundWindow();
+                        if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
+                        {
+
+                        }
+
+
                         DrawImageToForm();
                     }
                     else
@@ -468,7 +525,7 @@ namespace OEAMTCMirror
                 var activeProcessID = activeProcess.Id;
                 var selectedProcess = _mirrorState.SelectedProcess.Id;
 
-                if (activeProcessID != selectedProcess)
+                if (activeProcessID != selectedProcess && _mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot)
                 {
                     // Simulate a key press
                     User32.keybd_event((byte)User32.ALT, 0x45, User32.EXTENDEDKEY | 0, 0);
@@ -481,11 +538,12 @@ namespace OEAMTCMirror
 
                 var placement = GetPlacement(process.MainWindowHandle);
 
-                if (placement.showCmd == User32.ShowWindowCommands.Minimized)
-                {
-                    //User32.ShowWindowAsync(process.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
-                    User32.ShowWindowAsync(process.MainWindowHandle, User32.SW_SHOWNORMAL);
-                }
+                //if (placement.showCmd == User32.ShowWindowCommands.Minimized || placement.showCmd == User32.ShowWindowCommands.Normal)
+                //{
+                //    User32.ShowWindowAsync(process.MainWindowHandle, User32.SW_SHOWMINIMIZED);
+                //User32.ShowWindowAsync(process.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                User32.ShowWindow(process.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                //}
             }
             catch (Exception ex)
             {
@@ -655,7 +713,7 @@ namespace OEAMTCMirror
             GetDesktopWindowsTitlesToPrivateVar();
             MoveWindows();
         }
-        
+
 
         private void OriginalForm_Resize(object sender, EventArgs e)
         {
@@ -692,6 +750,11 @@ namespace OEAMTCMirror
                 this.Show();
                 this.WindowState = FormWindowState.Normal;
             }
+        }
+
+        private void btnCloseApp_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

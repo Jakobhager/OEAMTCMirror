@@ -147,6 +147,7 @@ namespace OEAMTCMirror
         public const int SW_SHOWNORMAL = 1;
         public const int SW_SHOWMINIMIZED = 2;
         public const int SW_SHOWMAXIMIZED = 3;
+        public const int SW_SHOW = 5;
 
         public const int ALT = 0xA4;
         public const int EXTENDEDKEY = 0x1;

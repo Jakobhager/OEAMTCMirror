@@ -34,6 +34,7 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.label1 = new System.Windows.Forms.Label();
             this.windowClosedTimer = new System.Windows.Forms.Timer(this.components);
+            this.btnCloseApp = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // timer1
@@ -64,12 +65,24 @@
             // 
             this.windowClosedTimer.Interval = 1000;
             // 
+            // btnCloseApp
+            // 
+            this.btnCloseApp.Location = new System.Drawing.Point(50, 29);
+            this.btnCloseApp.Name = "btnCloseApp";
+            this.btnCloseApp.Size = new System.Drawing.Size(75, 23);
+            this.btnCloseApp.TabIndex = 1;
+            this.btnCloseApp.Text = "Schließen";
+            this.btnCloseApp.UseVisualStyleBackColor = true;
+            this.btnCloseApp.Click += new System.EventHandler(this.btnCloseApp_Click);
+            // 
             // OriginalForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(150, 43);
+            this.ClientSize = new System.Drawing.Size(133, 65);
+            this.Controls.Add(this.btnCloseApp);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OriginalForm";
             this.Text = "OEAMTCMirror";
@@ -85,6 +98,7 @@
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Timer windowClosedTimer;
+        private System.Windows.Forms.Button btnCloseApp;
     }
 }
 
