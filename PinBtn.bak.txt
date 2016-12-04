@@ -37,6 +37,7 @@ namespace OEAMTCMirror
 
             btnStartMirror.BackgroundImage = Properties.Resources.btn_bg;
 
+            //btnStartMirror.Hide();
             this.ClientSize = new Size(26, 26);
         }
 
@@ -68,6 +69,15 @@ namespace OEAMTCMirror
                     User32.Rect rectangleWindow = new User32.Rect();
                     User32.GetWindowRect(ptr, ref rectangleWindow);
 
+                    //if (!_mirrorState.Active && prc.ProcessName != "Idle")
+                    //{
+                    //    _mirrorState.SelectedProcess = prc;
+                    //}
+
+                    //_mirrorState.SelectedProcess = prc;
+
+
+
                     this.Top = rectangleWindow.top + 5;
                     this.Left = rectangleWindow.right - 170;
                     this.Show();
@@ -89,6 +99,7 @@ namespace OEAMTCMirror
 
                     this.Hide();
 
+
                     Thread.Sleep(500);
 
                     uint processID;
@@ -98,6 +109,46 @@ namespace OEAMTCMirror
 
                     _mirrorState.SelectedProcess = prc;
 
+               
+
+                    //Process curPrc = Process.GetCurrentProcess();
+
+                    //if (prc.ProcessName != curPrc.ProcessName)
+                    //{
+                    //    _mirrorState.SelectedProcess = prc;
+                    //}
+                    //else
+                    //{
+                    //    //IntPtr ptr1 = User32.GetWindow(Process.GetCurrentProcess().MainWindowHandle, User32.GetWindowType.GW_HWNDNEXT);
+                    //    //int prcid = User32.GetProcessId(ptr1);
+                    //    //_mirrorState.SelectedProcess = Process.GetProcessById(prcid);
+
+                    //    uint prcid = 0;
+                    //    User32.GetWindowThreadProcessId(prc.MainWindowHandle, out prcid);
+
+                    //    _mirrorState.SelectedProcess = Process.GetProcessById(Convert.ToInt32(prcid));
+                    //}
+
+                    //while (true)
+                    //{
+                    //    if (prc.ProcessName == "Idle")
+                    //    {
+                    //        uint processID1;
+                    //        IntPtr foregroundWnd1 = User32.GetForegroundWindow();
+                    //        User32.GetWindowThreadProcessId(foregroundWnd1, out processID1);
+                    //        Process prc1 = Process.GetProcessById((int)processID1);
+
+                    //        //uint prcid1 = 0;
+                    //        //User32.GetWindowThreadProcessId(prc.MainWindowHandle, out prcid1);
+
+                    //        _mirrorState.SelectedProcess = prc1;
+                    //        break;
+                    //    }
+                    //    else
+                    //    {
+                    //        break;
+                    //    }
+                    //}
                     PositionButton();
 
 
@@ -170,7 +221,7 @@ namespace OEAMTCMirror
                 ptLowerLeft.X -= 5;
                 ptLowerLeft.Y -= 5;
                 contextMenuStrip1.Show(ptLowerLeft);
-                this._contextOpened = true;
+                _contextOpened = true;
             }
         }
 

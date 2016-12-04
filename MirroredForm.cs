@@ -28,8 +28,8 @@ namespace OEAMTCMirror
 
         private void btnCloseMirror_Click(object sender, EventArgs e)
         {
-            this.Hide();
             _mainForm.StopMirroring();
+            this.Close();
         }
     }
 }

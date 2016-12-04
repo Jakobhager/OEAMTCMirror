@@ -50,7 +50,6 @@
             this.btnStartMirror.Size = new System.Drawing.Size(26, 20);
             this.btnStartMirror.TabIndex = 0;
             this.btnStartMirror.UseVisualStyleBackColor = true;
-            this.btnStartMirror.Click += new System.EventHandler(this.btnStartMirror_Click);
             this.btnStartMirror.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnStartMirror_MouseDown);
             this.btnStartMirror.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnStartMirror_MouseUp);
             // 

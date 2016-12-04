@@ -86,6 +86,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OriginalForm";
             this.Text = "OEAMTCMirror";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OriginalForm_FormClosing);
             this.Resize += new System.EventHandler(this.OriginalForm_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();

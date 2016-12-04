@@ -147,6 +147,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OriginalForm.bak.txt" />
+    <Content Include="PinBtn.bak.txt" />
     <None Include="notifiyicon_active.png" />
     <None Include="notifiyicon.png" />
     <None Include="icon_active.ico" />

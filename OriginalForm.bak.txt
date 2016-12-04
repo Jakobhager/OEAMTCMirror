@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,8 +20,8 @@ namespace OEAMTCMirror
 
         private MirroredForm _mirroredForm;
 
-        //private static LogWriter _log = new LogWriter();
-        private static LogWriter _log = null;
+        private static LogWriter _log = new LogWriter();
+        //private static LogWriter _log = null;
         List<Process> _processes = new List<Process>();
         SecondScreenMirror _secondScreenMirror;
         MirrorIndicator _mirrorIndicator = new MirrorIndicator();
@@ -29,16 +29,26 @@ namespace OEAMTCMirror
         public PinBtn _pinBtnForm;
 
 
+
+        private static Random random = new Random();
+
         private string[] _screenshotWindows = { "chrome", "whatsapp", "iexplore", "swtor", "client", "opera", "vivaldi", "notepad", "skype" };
         public string[] _excludedWindows = { "explorer", Process.GetCurrentProcess().ProcessName };
 
-
         List<Process> _openWindows = new List<Process>();
+
         MirrorState _mirrorState;
+
         private ContextMenu _notifyContextMenu = new ContextMenu();
+
         private HotKey HK;
+
         private bool _clicked = false;
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            User32.UnregisterHotKey(this.Handle, 1);
+        }
 
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
@@ -78,7 +88,7 @@ namespace OEAMTCMirror
             _notifyContextMenu.MenuItems.Add(_itemStop);
 
             itemClose.Index = 3;
-            itemClose.Text = "SchlieÃŸen";
+            itemClose.Text = "Schließen";
             itemClose.Click += new EventHandler(this.itemClose_Click);
 
             _itemStop.Index = 0;
@@ -113,7 +123,7 @@ namespace OEAMTCMirror
             }
             else
             {
-                MessageBox.Show("Single monitor nicht unterstÃ¼tzt.\r\nSpiegelung funtkioniert nicht wie gewÃ¼nscht.");
+                MessageBox.Show("Single monitor nicht unterstützt.\r\nSpiegelung funtkioniert nicht wie gewünscht.");
 
                 Environment.Exit(0);
             }
@@ -158,6 +168,53 @@ namespace OEAMTCMirror
                     StopMirroring();
                 }
 
+
+                //check if window is closed an we can stop the mirror
+                //_openWindows.Clear();
+                //GetDesktopWindowsTitlesToPrivateVar();
+
+                //if (!_mirrorState.SelectedProcess.HasExited || !_openWindows.Contains(_mirrorState.SelectedProcess))
+                //{
+                //    if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
+                //    {
+                //        var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
+
+                //        if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
+                //            //!User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                //            placement.showCmd == User32.ShowWindowCommands.Normal)
+                //        {
+                //            //BringWindowToForeground(_mirrorState.SelectedProcess);
+                //            User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOW);
+                //            User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                //        }
+                //    }
+                //    DrawImageToForm();
+                //}
+                //else
+                //{
+                //    StopMirroring();
+
+                //}
+
+
+                //is the active window the window we want to mirror and the mode is screenshot? maximize it
+                //if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
+                //{
+                //    var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
+
+                //    if (_mirrorState.MirrorType == MirrorState.MirrorTypes.Screenshot &&
+                //        //!User32.IsIconic(_mirrorState.SelectedProcess.MainWindowHandle) &&
+                //        placement.showCmd == User32.ShowWindowCommands.Normal)
+                //    {
+                //        //BringWindowToForeground(_mirrorState.SelectedProcess);
+                //        User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOW);
+                //        User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
+                //    }
+                //}
+
+                //capture and draw
+
+
                 if (GetProcessFromActiveWindow().Id == _mirrorState.SelectedProcess.Id)
                 {
                     _openWindows.Clear();
@@ -187,8 +244,11 @@ namespace OEAMTCMirror
             catch { }
         }
 
+
         public Bitmap CaptureApplication(Process proc)
         {
+            Bitmap cropped = null;
+
             try
             {
                 Bitmap bmpScreenshot = null;
@@ -201,14 +261,49 @@ namespace OEAMTCMirror
                         User32.ShowWindowAsync(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
                     }
 
+                    //bmpScreenshot = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, PixelFormat.Format32bppArgb);
                     bmpScreenshot = new Bitmap(Screen.PrimaryScreen.WorkingArea.Width, Screen.PrimaryScreen.WorkingArea.Height - 25, PixelFormat.Format32bppArgb);
                     var gfxScreenshot = Graphics.FromImage(bmpScreenshot);
+                    //gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X, Screen.PrimaryScreen.Bounds.Y, 0, 0, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
                     gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.WorkingArea.X, Screen.PrimaryScreen.WorkingArea.Y + 25, 0, 0, Screen.PrimaryScreen.WorkingArea.Size, CopyPixelOperation.SourceCopy);
+
                 }
                 else
                 {
+                    _log.Log("proc before: " + _mirrorState.SelectedProcess.ProcessName);
+                    if (_mirrorState.SelectedProcess.ProcessName == Process.GetCurrentProcess().ProcessName)
+                    {
+                        IntPtr ptr1 = User32.GetWindow(Process.GetCurrentProcess().MainWindowHandle, User32.GetWindowType.GW_HWNDNEXT);
+
+                        IntPtr ptr2 = User32.GetWindow(ptr1, User32.GetWindowType.GW_HWNDNEXT);
+
+
+                        int prcid = User32.GetProcessId(ptr2);
+                        //_mirrorState.SelectedProcess = Process.GetProcessById(prcid);
+
+                        //_mirrorState.SelectedProcess = GetProcessFromActiveWindow();
+                    }
+                    _log.Log("proc after: " + _mirrorState.SelectedProcess.ProcessName);
+
+
+
                     try
                     {
+                        if (_mirrorState.SelectedProcess.ProcessName == "Idle" || _mirrorState.SelectedProcess.ProcessName == Process.GetCurrentProcess().ProcessName)
+                        {
+                            //_mirrorState.SelectedProcess = GetProcessFromActiveWindow();
+
+                            IntPtr ptr = User32.GetForegroundWindow();
+
+                            uint prcId;
+                            User32.GetWindowThreadProcessId(ptr, out prcId);
+
+                            //_mirrorState.SelectedProcess = Process.GetProcessById((int)prcId);
+                        }
+
+                        _log.Log("proc set: " + _mirrorState.SelectedProcess.ProcessName);
+
+
                         User32.Rect rct = new User32.Rect();
                         User32.GetWindowRect(_mirrorState.SelectedProcess.MainWindowHandle, ref rct);
 
@@ -615,11 +710,6 @@ namespace OEAMTCMirror
         private void btnCloseApp_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void OriginalForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            User32.UnregisterHotKey(this.Handle, 1);
         }
     }
 }
