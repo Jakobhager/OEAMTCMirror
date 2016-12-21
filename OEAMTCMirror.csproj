@@ -59,6 +59,9 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ManagedWinapi">
+      <HintPath>.\ManagedWinapi.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -78,6 +81,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RegistryWrapper.cs" />
     <Compile Include="SecondScreenMirror.cs">
       <SubType>Form</SubType>
     </Compile>

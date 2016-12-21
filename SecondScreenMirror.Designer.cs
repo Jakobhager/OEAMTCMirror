@@ -57,8 +57,6 @@
             this.Controls.Add(this.pictureBox1);
             this.Name = "SecondScreenMirror";
             this.Text = "SecondScreenMirror";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SecondScreenMirror_FormClosed);
-            this.Load += new System.EventHandler(this.SecondScreenMirror_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 

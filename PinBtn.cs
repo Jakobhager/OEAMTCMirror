@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ManagedWinapi;
 
 namespace OEAMTCMirror
 {
@@ -20,6 +21,7 @@ namespace OEAMTCMirror
         private OriginalForm _mainForm;
         MirrorState _mirrorState;
         private bool _contextOpened = false;
+        User32.Rect _oldPosition = new User32.Rect();
 
 
         public PinBtn(LogWriter log, Form mainfrm, MirrorState stateObj)
@@ -51,25 +53,56 @@ namespace OEAMTCMirror
             }
         }
 
+        //protected override void WndProc(ref Message m)
+        //{
+        //    base.WndProc(ref m);
+
+        //    if (m.Msg == 0x00A1)
+        //    {
+        //        //PositionButton();
+        //        MessageBox.Show("df");
+        //    }
+        //}
+
         public void PositionButton()
         {
             try
             {
+                //this.Hide();
+                //Thread.Sleep(500);
                 uint processID;
                 IntPtr foregroundWnd = User32.GetForegroundWindow();
                 User32.GetWindowThreadProcessId(foregroundWnd, out processID);
                 Process prc = Process.GetProcessById((int)processID);
 
-                if (prc.ProcessName != Process.GetCurrentProcess().ProcessName && prc.MainWindowTitle != "Shell_Traywnd" && !_mainForm._excludedWindows.Contains(prc.ProcessName))
+
+                //// Simulate a key press
+                //User32.keybd_event((byte)User32.ALT, 0x45, User32.EXTENDEDKEY | 0, 0);
+
+                //// Simulate a key release
+                //User32.keybd_event((byte)User32.ALT, 0x45, User32.EXTENDEDKEY | User32.KEYUP, 0);
+
+                //User32.SetForegroundWindow(foregroundWnd);
+
+                if (prc.ProcessName != Process.GetCurrentProcess().ProcessName && prc.MainWindowTitle != "Shell_Traywnd" && !_mainForm._defaultExcludedWindows.Contains(prc.ProcessName))
                 {
-                    btnStartMirror.Show();
                     IntPtr ptr = prc.MainWindowHandle;
 
                     User32.Rect rectangleWindow = new User32.Rect();
                     User32.GetWindowRect(ptr, ref rectangleWindow);
 
+                    //ManagedWinapi.Windows.SystemWindow wnd = new ManagedWinapi.Windows.SystemWindow(ptr);
+
+                    //ManagedWinapi.Windows.RECT rectangleWindow = new ManagedWinapi.Windows.RECT();
+                    //ManagedWinapi.Windows.
+
+
+                    //this.Top = wnd.Position.Top + 5;
+                    //this.Left = wnd.Position.Right - 170;
                     this.Top = rectangleWindow.top + 5;
                     this.Left = rectangleWindow.right - 170;
+                    btnStartMirror.Show();
+
                     this.Show();
                 }
             }
@@ -77,6 +110,14 @@ namespace OEAMTCMirror
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private bool CheckOnNewPosition(User32.Rect rc)
+        {
+            if (!rc.Equals(_oldPosition))
+                return true;
+            else
+                return false;
         }
 
         private void MirrorOnBtnClick()
@@ -177,7 +218,6 @@ namespace OEAMTCMirror
         private void btnStartMirror_MouseUp(object sender, MouseEventArgs e)
         {
             timer1.Start();
-            _mainForm.timer1.Interval = 5;
             _mainForm.timer1.Start();
         }
         private void stopMirrorToolStripMenuItem_Click(object sender, EventArgs e)

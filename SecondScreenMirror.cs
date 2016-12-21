@@ -29,15 +29,5 @@ namespace OEAMTCMirror
         {
             _mainForm.DrawSecondScreenToWindow();
         }
-
-        private void SecondScreenMirror_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            _mainForm._pinBtnForm.Show();
-        }
-
-        private void SecondScreenMirror_Load(object sender, EventArgs e)
-        { 
-            _mainForm._pinBtnForm.Hide();
-        }
     }
 }

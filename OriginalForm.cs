@@ -29,9 +29,10 @@ namespace OEAMTCMirror
         public PinBtn _pinBtnForm;
 
 
-        private string[] _screenshotWindows = { "chrome", "whatsapp", "iexplore", "swtor", "client", "opera", "vivaldi", "notepad", "skype" };
-        public string[] _excludedWindows = { "explorer", Process.GetCurrentProcess().ProcessName };
+        private List<string> _defaultScreenshotWindows = new List<string>(new string[] { "chrome", "whatsapp", "iexplore", "swtor", "client", "opera", "vivaldi", "skype", "notepad" });
+        public List<string> _defaultExcludedWindows = new List<string>(new string[] { "explorer", Process.GetCurrentProcess().ProcessName });
 
+        private RegistryWrapper _registryWrapper = new RegistryWrapper();
 
         List<Process> _openWindows = new List<Process>();
         MirrorState _mirrorState;
@@ -96,16 +97,41 @@ namespace OEAMTCMirror
 
             notifyIcon1.ContextMenu = _notifyContextMenu;
 
-            CreatePinBtnForm();
-            _pinBtnForm.PositionButton();
+            //CreatePinBtnForm();
+            //_pinBtnForm.PositionButton();
 
             HK = new HotKey();
-            HK.enable(this.Handle, 0, Keys.F8);
+
+            Keys mirrorHotkey = Keys.F8;
+
+            bool checkHotkey = _registryWrapper.Exists("Hotkey");
+            if (checkHotkey)
+            {
+                string key = _registryWrapper.ReadString("Hotkey");
+                mirrorHotkey  = (Keys)System.Enum.Parse(typeof(Keys), key);
+            }
+
+
+            //HK.enable(this.Handle, 0, Keys.F8);
+            HK.enable(this.Handle, 0, mirrorHotkey);
 
             timer1.Stop();
 
             Screen[] screens = Screen.AllScreens;
 
+            bool checkExcluded = _registryWrapper.Exists("ExcludedWindows");
+            if (checkExcluded)
+            {
+                _defaultExcludedWindows = new List<string>(_registryWrapper.ReadArray("ExcludedWindows"));
+
+                _defaultExcludedWindows.Add(Process.GetCurrentProcess().ProcessName);
+            }
+
+            bool checkScreenshot = _registryWrapper.Exists("ScreenshotWindows");
+            if (checkScreenshot)
+            {
+                _defaultScreenshotWindows = new List<string>(_registryWrapper.ReadArray("ScreenshotWindows"));
+            }
 
             if (screens.Length > 1)
             {
@@ -192,7 +218,7 @@ namespace OEAMTCMirror
             try
             {
                 Bitmap bmpScreenshot = null;
-                if (_screenshotWindows.Contains(_mirrorState.SelectedProcess.ProcessName.ToLower()))
+                if (_defaultScreenshotWindows.Contains(_mirrorState.SelectedProcess.ProcessName.ToLower()))
                 {
                     var placement = GetPlacement(_mirrorState.SelectedProcess.MainWindowHandle);
 
@@ -335,7 +361,7 @@ namespace OEAMTCMirror
 
                 _mirroredForm.MirrorPictureBox.Image = bmp;
 
-                _pinBtnForm.PositionButton();
+                //_pinBtnForm.PositionButton();
 
 
                 GC.Collect();
@@ -343,8 +369,8 @@ namespace OEAMTCMirror
             catch (Exception ex)
             {
                 //MessageBox.Show(ex.ToString());
-                _log.Log(ex.ToString());
-                _pinBtnForm.PositionButton();
+                //_log.Log(ex.ToString());
+                //_pinBtnForm.PositionButton();
             }
         }
         public void DrawSecondScreenToWindow()
@@ -437,7 +463,13 @@ namespace OEAMTCMirror
         {
             foreach (Process prc in _openWindows)
             {
+                if (prc.ProcessName == "explorer")
+                {
+                    User32.Rect rc = new User32.Rect();
+                    User32.GetWindowRect(prc.MainWindowHandle, ref rc);
+                }
                 User32.SetWindowPos(prc.MainWindowHandle, IntPtr.Zero, 0, 0, 0, 0, User32.SetWindowPosFlags.DoNotChangeOwnerZOrder | User32.SetWindowPosFlags.IgnoreResize);
+
             }
         }
 
@@ -488,7 +520,14 @@ namespace OEAMTCMirror
 
                 _clicked = true;
 
-                if (_screenshotWindows.Contains(_mirrorState.SelectedProcess.ProcessName))
+                uint processID;
+                IntPtr foregroundWnd = User32.GetForegroundWindow();
+                User32.GetWindowThreadProcessId(foregroundWnd, out processID);
+                Process prc = Process.GetProcessById((int)processID);
+
+                _mirrorState.SelectedProcess = prc;
+
+                if (_defaultScreenshotWindows.Contains(_mirrorState.SelectedProcess.ProcessName))
                 {
                     _mirrorState.MirrorType = MirrorState.MirrorTypes.Screenshot;
                     User32.ShowWindow(_mirrorState.SelectedProcess.MainWindowHandle, User32.SW_SHOWMAXIMIZED);
@@ -501,7 +540,7 @@ namespace OEAMTCMirror
                 this.WindowState = FormWindowState.Minimized;
 
                 //Allow 250 milliseconds for the screen to repaint itself (we don't want to include this form in the capture)
-                Thread.Sleep(350);
+                Thread.Sleep(250);
 
                 DrawImageToForm();
 
@@ -512,6 +551,8 @@ namespace OEAMTCMirror
                 _itemStop.Enabled = true;
 
                 notifyIcon1.Icon = Properties.Resources.icon_active;
+
+                GC.Collect();
             }
             catch (Exception ex)
             {
@@ -524,7 +565,10 @@ namespace OEAMTCMirror
         {
             try
             {
-                Thread.Sleep(200);
+                if (_mirrorState.SelectedProcess.ProcessName.ToLower() != "iexplore")
+                {
+                    Thread.Sleep(200);
+                }
 
                 timer1.Stop();
                 _mirrorState.Active = false;
@@ -537,8 +581,8 @@ namespace OEAMTCMirror
 
                 notifyIcon1.Icon = Properties.Resources.notifiyicon;
 
-                _pinBtnForm.Close();
-                CreatePinBtnForm();
+                //_pinBtnForm.Close();
+                //CreatePinBtnForm();
 
                 GC.Collect();
             }
@@ -585,7 +629,7 @@ namespace OEAMTCMirror
 
         private void notifyIcon1_MouseDown(object sender, MouseEventArgs e)
         {
-            _pinBtnForm.Hide();
+            //_pinBtnForm.Hide();
             if (_mirrorState.Active)
             {
                 timer1.Stop();
@@ -594,7 +638,7 @@ namespace OEAMTCMirror
 
         private void notifyIcon1_MouseUp(object sender, MouseEventArgs e)
         {
-            _pinBtnForm.Show();
+            //_pinBtnForm.Show();
             if (!_mirrorState.Active)
             {
                 timer1.Start();
