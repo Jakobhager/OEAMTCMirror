@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -31,8 +32,20 @@ namespace OEAMTCMirror
 
         private List<string> _defaultScreenshotWindows = new List<string>(new string[] { "chrome", "whatsapp", "iexplore", "swtor", "client", "opera", "vivaldi", "skype", "notepad" });
         public List<string> _defaultExcludedWindows = new List<string>(new string[] { "explorer", Process.GetCurrentProcess().ProcessName });
+        private Keys _defaultHotkey = Keys.F8;
+        private int _defaultMirrorIndex = Screen.AllScreens.Length;
 
-        private RegistryWrapper _registryWrapper = new RegistryWrapper();
+
+        private static string _registryFolder = "OEAMTCMirror";
+
+
+        RegistryKey folderKeyMachine = Registry.LocalMachine.CreateSubKey("SOFTWARE\\" + _registryFolder);
+        RegistryKey folderKeyUser = Registry.CurrentUser.CreateSubKey("SOFTWARE\\" + _registryFolder);
+
+
+
+        private RegistryWrapper _registryWrapperMachine = new RegistryWrapper(0);
+        private RegistryWrapper _registryWrapperUser = new RegistryWrapper(1);
 
         List<Process> _openWindows = new List<Process>();
         MirrorState _mirrorState;
@@ -40,6 +53,7 @@ namespace OEAMTCMirror
         private HotKey HK;
         private bool _clicked = false;
 
+        
 
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
@@ -100,38 +114,20 @@ namespace OEAMTCMirror
             //CreatePinBtnForm();
             //_pinBtnForm.PositionButton();
 
+            FirstStartCheck();
+
             HK = new HotKey();
+            HK.enable(this.Handle, 0, GetHotkeyFromRegistry());
 
-            Keys mirrorHotkey = Keys.F8;
+            GetExcludedWindowsFromRegistry();
+            GetScreenshotWindowsFromRegistry();
 
-            bool checkHotkey = _registryWrapper.Exists("Hotkey");
-            if (checkHotkey)
-            {
-                string key = _registryWrapper.ReadString("Hotkey");
-                mirrorHotkey  = (Keys)System.Enum.Parse(typeof(Keys), key);
-            }
+            _defaultMirrorIndex = GetMirrorScreenIndexFromRegistry();
 
-
-            //HK.enable(this.Handle, 0, Keys.F8);
-            HK.enable(this.Handle, 0, mirrorHotkey);
 
             timer1.Stop();
 
             Screen[] screens = Screen.AllScreens;
-
-            bool checkExcluded = _registryWrapper.Exists("ExcludedWindows");
-            if (checkExcluded)
-            {
-                _defaultExcludedWindows = new List<string>(_registryWrapper.ReadArray("ExcludedWindows"));
-
-                _defaultExcludedWindows.Add(Process.GetCurrentProcess().ProcessName);
-            }
-
-            bool checkScreenshot = _registryWrapper.Exists("ScreenshotWindows");
-            if (checkScreenshot)
-            {
-                _defaultScreenshotWindows = new List<string>(_registryWrapper.ReadArray("ScreenshotWindows"));
-            }
 
             if (screens.Length > 1)
             {
@@ -162,8 +158,8 @@ namespace OEAMTCMirror
             _mirroredForm = new MirroredForm(this);
             _mirroredForm.WindowState = FormWindowState.Normal;
             _mirroredForm.StartPosition = FormStartPosition.Manual;
-            _mirroredForm.Location = screens[screens.Length - 1].WorkingArea.Location;
-            _mirroredForm.Size = screens[screens.Length - 1].Bounds.Size;
+            _mirroredForm.Location = screens[_defaultMirrorIndex - 1].WorkingArea.Location;
+            _mirroredForm.Size = screens[_defaultMirrorIndex - 1].Bounds.Size;
         }
 
         private static User32.WINDOWPLACEMENT GetPlacement(IntPtr hwnd)
@@ -593,6 +589,92 @@ namespace OEAMTCMirror
             }
         }
 
+        private void FirstStartCheck()
+        {
+            string checkFirstStart = (string)folderKeyMachine.GetValue("Initiated");
+
+            if (checkFirstStart == null)
+            {
+                folderKeyMachine.SetValue("Initiated", "true");
+            }
+        }
+
+        private int GetMirrorScreenIndexFromRegistry()
+        {
+            int index = _defaultMirrorIndex;
+
+            string machVal = (string)folderKeyMachine.GetValue("MirrorIndex");
+            if (machVal != null)
+            {
+                index = Int32.Parse(machVal);
+            }
+
+            string usrVal = (string)folderKeyUser.GetValue("MirrorIndex");
+            if (usrVal != null)
+            {
+                index = Int32.Parse(usrVal);
+            }
+
+            if (index > Screen.AllScreens.Length)
+            {
+                return Screen.AllScreens.Length;
+            }
+            else
+            {
+                return index;
+            }
+        }
+
+        private Keys GetHotkeyFromRegistry()
+        {
+            Keys key = _defaultHotkey;
+
+            string machVal = (string)folderKeyMachine.GetValue("Hotkey");
+            if (machVal != null)
+            {
+                key = (Keys)Enum.Parse(typeof(Keys), machVal);
+            }
+
+            string usrVal = (string)folderKeyUser.GetValue("Hotkey");
+            if (usrVal != null)
+            {
+                key = (Keys)Enum.Parse(typeof(Keys), usrVal);
+            }
+
+            return key;
+        }
+
+        private void GetExcludedWindowsFromRegistry()
+        {
+            string[] machVal = (string[])folderKeyMachine.GetValue("ExcludedWindows");
+            if (machVal != null)
+            {
+                _defaultExcludedWindows = new List<string>(machVal);
+            }
+
+            string[] usrVal = (string[])folderKeyUser.GetValue("ExcludedWindows");
+            if (usrVal != null)
+            {
+                _defaultExcludedWindows = new List<string>(usrVal);
+            }
+
+            _defaultExcludedWindows.Add(Process.GetCurrentProcess().ProcessName);
+        }
+
+        private void GetScreenshotWindowsFromRegistry()
+        {
+            string[] machVal = (string[])folderKeyMachine.GetValue("ScreenshotWindows");
+            if (machVal != null)
+            {
+                _defaultScreenshotWindows = new List<string>(machVal);
+            }
+
+            string[] usrVal = (string[])folderKeyUser.GetValue("ScreenshotWindows");
+            if (usrVal != null)
+            {
+                _defaultScreenshotWindows = new List<string>(usrVal);
+            }
+        }
 
         #region Clicks, Hovers, etc.
         private void itemClose_Click(object Sender, EventArgs e)
