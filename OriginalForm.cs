@@ -43,10 +43,6 @@ namespace OEAMTCMirror
         RegistryKey folderKeyUser = Registry.CurrentUser.CreateSubKey("SOFTWARE\\" + _registryFolder);
 
 
-
-        private RegistryWrapper _registryWrapperMachine = new RegistryWrapper(0);
-        private RegistryWrapper _registryWrapperUser = new RegistryWrapper(1);
-
         List<Process> _openWindows = new List<Process>();
         MirrorState _mirrorState;
         private ContextMenu _notifyContextMenu = new ContextMenu();
