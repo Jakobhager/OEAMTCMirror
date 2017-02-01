@@ -9,47 +9,25 @@ namespace OEAMTCMirror
 {
     public class MirrorState
     {
+        private bool active;
+
         public enum Modes {Null, Hotkey, Button};
         public enum MirrorTypes { Screenshot, Window };
 
-        private bool _mirrorState;
-        private Process _process;
-        private MirrorTypes _type;
-
         public bool Active
         {
-            get
-            {
-                return this._mirrorState;
-            }
+            get { return active; }
             set
             {
-                this._mirrorState = value;
+                active = value;
+                ActiveStatusChanged?.Invoke(this, active);
             }
         }
 
-        public Process SelectedProcess
-        {
-            get
-            {
-                return this._process;                    
-            }
-            set
-            {
-                this._process = value;
-            }
-        }
+        private event EventHandler<bool> ActiveStatusChanged;
 
-        public MirrorTypes MirrorType
-        {
-            get
-            {
-                return this._type;
-            }
-            set
-            {
-                this._type = value;
-            }
-        }
+        public Process SelectedProcess { get; set; }
+
+        public MirrorTypes MirrorType { get; set; }
     }
 }

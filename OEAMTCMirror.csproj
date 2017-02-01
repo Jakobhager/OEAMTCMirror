@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OEAMTCMirror</RootNamespace>
     <AssemblyName>OEAMTCMirror</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -26,6 +26,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -106,14 +107,14 @@
     <Compile Include="MirroredForm.Designer.cs">
       <DependentUpon>MirroredForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PinBtn.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PinBtn.Designer.cs">
-      <DependentUpon>PinBtn.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartMirroringForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StartMirroringForm.Designer.cs">
+      <DependentUpon>StartMirroringForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="User32.cs" />
     <EmbeddedResource Include="SecondScreenMirror.resx">
       <DependentUpon>SecondScreenMirror.cs</DependentUpon>
@@ -127,13 +128,13 @@
     <EmbeddedResource Include="OriginalForm.resx">
       <DependentUpon>OriginalForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PinBtn.resx">
-      <DependentUpon>PinBtn.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StartMirroringForm.resx">
+      <DependentUpon>StartMirroringForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -151,7 +152,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="OriginalForm.bak.txt" />
-    <Content Include="PinBtn.bak.txt" />
     <None Include="notifiyicon_active.png" />
     <None Include="notifiyicon.png" />
     <None Include="icon_active.ico" />
@@ -168,6 +168,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="InjectionCore\InjectionCore.csproj">
+      <Project>{5dd44e02-0e6c-4157-84e8-39961523a480}</Project>
+      <Name>InjectionCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
