@@ -120,7 +120,7 @@ namespace OEAMTCMirror
             _defaultMirrorIndex = GetMirrorScreenIndexFromRegistry();
 
 
-            //timer1.Stop();
+            timer1.Stop();
 
             Screen[] screens = Screen.AllScreens;
 
@@ -141,21 +141,13 @@ namespace OEAMTCMirror
 
         private void CreateMirrorForm()
         {
-            Thread mirrorFormThread = new Thread(() =>
-            {
-                Screen[] screens = Screen.AllScreens;
+            Screen[] screens = Screen.AllScreens;
 
-                _mirroredForm = new MirroredForm
-                {
-                    WindowState = FormWindowState.Normal,
-                    StartPosition = FormStartPosition.Manual,
-                    Location = screens[_defaultMirrorIndex - 1].WorkingArea.Location,
-                    Size = screens[_defaultMirrorIndex - 1].Bounds.Size
-                };
-                Application.Run(_mirroredForm);
-            });
-            mirrorFormThread.SetApartmentState(ApartmentState.STA);
-            mirrorFormThread.Start();
+            _mirroredForm = new MirroredForm(this);
+            _mirroredForm.WindowState = FormWindowState.Normal;
+            _mirroredForm.StartPosition = FormStartPosition.Manual;
+            _mirroredForm.Location = screens[_defaultMirrorIndex - 1].WorkingArea.Location;
+            _mirroredForm.Size = screens[_defaultMirrorIndex - 1].Bounds.Size;
         }
 
         private static User32.WINDOWPLACEMENT GetPlacement(IntPtr hwnd)
@@ -338,18 +330,23 @@ namespace OEAMTCMirror
             {
                 Bitmap bmp = CaptureApplication(_mirrorState.SelectedProcess);
 
+                string stamp = DateTime.Now.ToString("hh.mm.ss.ffffff");
+
+                //this.DrawToBitmap(bmp, new Rectangle(Point.Empty, bmp.Size));
+
                 if (_clicked)
                 {
                     Thread.Sleep(200);
                     _clicked = false;
                 }
-                _mirroredForm.MirrorPictureBox.Invoke((Action)(() =>
-                {
-                    if (bmp == null) return;
-                    _mirroredForm.MirrorPictureBox.Height = bmp.Height;
-                    _mirroredForm.MirrorPictureBox.Width = bmp.Width;
-                    _mirroredForm.MirrorPictureBox.Image = bmp;
-                }));
+
+                _mirroredForm.MirrorPictureBox.Height = bmp.Height;
+                _mirroredForm.MirrorPictureBox.Width = bmp.Width;
+
+                _mirroredForm.MirrorPictureBox.Image = bmp;
+
+                //_pinBtnForm.PositionButton();
+
 
                 GC.Collect();
             }
