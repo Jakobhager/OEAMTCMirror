@@ -16,16 +16,21 @@ namespace OEAMTCMirror
     public partial class StartMirroringForm : InjectableForm
     {
         private readonly MirrorState mirrorState;
+        private readonly Action startMirroringAction;
+        private readonly Action stopMirroringAction;
 
         public StartMirroringForm()
         {
             InitializeComponent();
         }
 
-        public StartMirroringForm(IntPtr parentHandle, MirrorState mirrorState) : base(parentHandle)
+        public StartMirroringForm(IntPtr parentHandle, MirrorState mirrorState, Action startMirroringAction, Action stopMirroringAction) : base(parentHandle)
         {
             InitializeComponent();
             this.mirrorState = mirrorState;
+            this.startMirroringAction = startMirroringAction;
+            this.stopMirroringAction = stopMirroringAction;
+            this.ShowInTaskbar = false;
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -34,8 +39,9 @@ namespace OEAMTCMirror
             {
                 try
                 {
-                    mirrorState.SelectedProcess = null;
-                    mirrorState.Active = false;
+                    if (mirrorState.SelectedProcess.MainWindowHandle != ParentHandle)
+                        return;
+                    stopMirroringAction();
                     pictureBox1.Image = Resources.btn_bg;
                 }
                 catch (Exception exception)
@@ -48,9 +54,8 @@ namespace OEAMTCMirror
             {
                 try
                 {
-                    mirrorState.SelectedProcess =
-                        Process.GetProcesses().First(process => process.MainWindowHandle == ParentHandle);
-                    mirrorState.Active = true;
+                    User32.SetForegroundWindow(ParentHandle);
+                    startMirroringAction();
                     pictureBox1.Image = Resources.btn_bg_active;
                 }
                 catch (Exception exception)

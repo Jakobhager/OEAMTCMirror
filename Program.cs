@@ -24,9 +24,14 @@ namespace OEAMTCMirror
              // todo: create factory
             MirrorState stateObject = new MirrorState();
             stateObject.Active = false;
-            makeFormInjector.Inject(new[] {new DefaultProcessSelector("explorer", Process.GetCurrentProcess().ProcessName, "devenv",
-                "ApplicationFrameHost", "ScriptedSandbox64") }, ptr => new StartMirroringForm(ptr, stateObject));
-            Application.Run(new OriginalForm(stateObject));
+            OriginalForm originalForm = new OriginalForm(stateObject);
+            makeFormInjector.Inject(new[]
+            {
+                new DefaultProcessSelector("explorer", Process.GetCurrentProcess().ProcessName, "devenv",
+                    "ApplicationFrameHost", "ScriptedSandbox64")
+            }, ptr => new StartMirroringForm(ptr, stateObject, originalForm.StartMirroring, originalForm.StopMirroring));
+            
+            Application.Run(originalForm);
         }
     }
 }

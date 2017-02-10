@@ -48,7 +48,7 @@ namespace OEAMTCMirror
         private HotKey HK;
         private bool _clicked = false;
 
-        
+
 
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
@@ -520,21 +520,39 @@ namespace OEAMTCMirror
                 {
                     _mirrorState.MirrorType = MirrorState.MirrorTypes.Window;
                 }
+                if (InvokeRequired)
+                {
+                    Invoke((Action)(() =>
+                    {
+                        WindowState = FormWindowState.Minimized;
+                        Thread.Sleep(250);
 
-                this.WindowState = FormWindowState.Minimized;
+                        DrawImageToForm();
 
-                //Allow 250 milliseconds for the screen to repaint itself (we don't want to include this form in the capture)
-                Thread.Sleep(250);
+                        timer1.Start();
+                        _mirroredForm.Show();
 
-                DrawImageToForm();
+                        _mirrorState.Active = true;
+                        _itemStop.Enabled = true;
 
-                timer1.Start();
-                _mirroredForm.Show();
+                        notifyIcon1.Icon = Properties.Resources.icon_active;
+                    }));
+                }
+                else
+                {
+                    this.WindowState = FormWindowState.Minimized;
+                    Thread.Sleep(250);
 
-                _mirrorState.Active = true;
-                _itemStop.Enabled = true;
+                    DrawImageToForm();
 
-                notifyIcon1.Icon = Properties.Resources.icon_active;
+                    timer1.Start();
+                    _mirroredForm.Show();
+
+                    _mirrorState.Active = true;
+                    _itemStop.Enabled = true;
+
+                    notifyIcon1.Icon = Properties.Resources.icon_active;
+                }
 
                 GC.Collect();
             }
@@ -549,7 +567,7 @@ namespace OEAMTCMirror
         {
             try
             {
-                if (_mirrorState.SelectedProcess.ProcessName.ToLower() != "iexplore")
+                if (_mirrorState.SelectedProcess?.ProcessName.ToLower() != "iexplore")
                 {
                     Thread.Sleep(200);
                 }
@@ -560,10 +578,27 @@ namespace OEAMTCMirror
 
                 _mirrorState.SelectedProcess = null;
 
-                _mirroredForm.Close();
-                _mirroredForm = null;
+                if (_mirroredForm == null)
+                    return;
 
-                notifyIcon1.Icon = Properties.Resources.notifiyicon;
+                if (_mirroredForm.InvokeRequired)
+                {
+                    _mirroredForm.Invoke((Action)(() =>
+                   {
+                       _mirroredForm.Close();
+                       _mirroredForm = null;
+                       notifyIcon1.Icon = Properties.Resources.notifiyicon;
+                   }));
+                }
+                else
+                {
+                    _mirroredForm.Close();
+                    _mirroredForm = null;
+                    notifyIcon1.Icon = Properties.Resources.notifiyicon;
+                }
+
+
+
 
                 //_pinBtnForm.Close();
                 //CreatePinBtnForm();
