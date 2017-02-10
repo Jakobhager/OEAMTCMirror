@@ -150,6 +150,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cursor_red.png" />
     <Content Include="OriginalForm.bak.txt" />
     <Content Include="PinBtn.bak.txt" />
     <None Include="notifiyicon_active.png" />
