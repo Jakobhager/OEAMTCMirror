@@ -8,6 +8,7 @@ namespace InjectionCore.Internals
 {
     internal class FormInjector : IFormInjector
     {
+        private readonly IEnumerable<IProcessSelector> processSelectors;
         private readonly Dictionary<IntPtr, Thread> injectionDictionary = new Dictionary<IntPtr, Thread>();
 
         static FormInjector()
@@ -15,13 +16,20 @@ namespace InjectionCore.Internals
             Debug.Print($"{DateTime.Now:G}: This injector create NEW threads for each form!");
         }
 
+        public FormInjector(IEnumerable<IProcessSelector> processSelectors)
+        {
+            this.processSelectors = processSelectors;
+        }
+
         public void Dispose()
         {
             foreach (Thread thread in injectionDictionary.Values)
                 thread.Abort();
+            foreach (IProcessSelector processSelector in processSelectors)
+                processSelector.Dispose();
         }
 
-        public void Inject<TForm>(IEnumerable<IProcessSelector> processSelectors, Func<IntPtr, TForm> formFactory)
+        public void Inject<TForm>(Func<IntPtr, TForm> formFactory)
             where TForm : InjectableForm
         {
             foreach (IProcessSelector windowSelector in processSelectors)

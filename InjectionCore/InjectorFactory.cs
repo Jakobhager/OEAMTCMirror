@@ -1,4 +1,5 @@
-﻿using InjectionCore.Abstractions;
+﻿using System.Collections.Generic;
+using InjectionCore.Abstractions;
 using InjectionCore.Internals;
 
 namespace InjectionCore
@@ -12,9 +13,9 @@ namespace InjectionCore
         ///     Creating instance of form injector
         /// </summary>
         /// <returns>FormInjector instance</returns>
-        public IFormInjector MakeFormInjector()
+        public IFormInjector MakeFormInjector(IEnumerable<IProcessSelector> processSelectors)
         {
-            return new FormInjector();
+            return new FormInjector(processSelectors);
         }
     }
 }

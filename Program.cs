@@ -20,17 +20,16 @@ namespace OEAMTCMirror
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             InjectorFactory injectorFactory = new InjectorFactory();
-            IFormInjector makeFormInjector = injectorFactory.MakeFormInjector();
-             // todo: create factory
-            MirrorState stateObject = new MirrorState();
-            stateObject.Active = false;
-            OriginalForm originalForm = new OriginalForm(stateObject);
-            makeFormInjector.Inject(new[]
+            IFormInjector makeFormInjector = injectorFactory.MakeFormInjector(new[]
             {
                 new DefaultProcessSelector("explorer", Process.GetCurrentProcess().ProcessName, "devenv",
                     "ApplicationFrameHost", "ScriptedSandbox64")
-            }, ptr => new StartMirroringForm(ptr, stateObject, originalForm.StartMirroring, originalForm.StopMirroring));
-            
+            });
+            MirrorState stateObject = new MirrorState();
+            stateObject.Active = false;
+            OriginalForm originalForm = new OriginalForm(stateObject, makeFormInjector);
+            makeFormInjector.Inject(ptr => new StartMirroringForm(ptr, stateObject, originalForm.StartMirroring, originalForm.StopMirroring));
+
             Application.Run(originalForm);
         }
     }

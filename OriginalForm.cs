@@ -1,18 +1,15 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using InjectionCore.Abstractions;
 
 namespace OEAMTCMirror
 {
@@ -44,6 +41,7 @@ namespace OEAMTCMirror
 
         List<Process> _openWindows = new List<Process>();
         MirrorState _mirrorState;
+        private readonly IFormInjector injector;
         private ContextMenu _notifyContextMenu = new ContextMenu();
         private HotKey HK;
         private bool _clicked = false;
@@ -72,11 +70,12 @@ namespace OEAMTCMirror
             base.WndProc(ref m);
         }
 
-        public OriginalForm(MirrorState stateObj)
+        public OriginalForm(MirrorState stateObj, IFormInjector injector)
         {
             InitializeComponent();
 
             _mirrorState = stateObj;
+            this.injector = injector;
 
             MenuItem itemClose = new MenuItem();
             MenuItem itemCheckSecond = new MenuItem();
@@ -702,6 +701,7 @@ namespace OEAMTCMirror
         #region Clicks, Hovers, etc.
         private void itemClose_Click(object Sender, EventArgs e)
         {
+            injector.Dispose();
             Application.Exit();
         }
 
@@ -763,6 +763,7 @@ namespace OEAMTCMirror
 
         private void btnCloseApp_Click(object sender, EventArgs e)
         {
+            injector.Dispose();
             Application.Exit();
         }
 
