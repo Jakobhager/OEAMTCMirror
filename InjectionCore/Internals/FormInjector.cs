@@ -24,7 +24,7 @@ namespace InjectionCore.Internals
         public void Dispose()
         {
             foreach (Thread thread in injectionDictionary.Values)
-                thread.Abort();
+                thread.Interrupt();
             foreach (IProcessSelector processSelector in processSelectors)
                 processSelector.Dispose();
         }
